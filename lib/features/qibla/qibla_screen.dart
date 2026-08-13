@@ -78,17 +78,20 @@ class _QiblaScreenState extends State<QiblaScreen>
           // Convert wrapped heading target into a nearby unwrapped target.
           final target = _heading! + angleDelta(_heading!, h);
           final error = target - _heading!;
+          final absError = error.abs();
+          final response = (absError / 45.0).clamp(0.0, 1.0);
 
-          // Critically damped spring for stable professional compass feel.
-          const k = 22.0; // stiffness
-          const c = 10.8; // damping
+          // Adaptive damping: fast settle on big changes, calm near target.
+          final k = 22.0 + 38.0 * response; // stiffness
+          final c = 10.8 + 5.8 * response; // damping
           final accel = k * error - c * _headingVelocity;
           _headingVelocity += accel * dt;
-          _headingVelocity = _headingVelocity.clamp(-220.0, 220.0);
+          final maxVel = 220.0 + 360.0 * response;
+          _headingVelocity = _headingVelocity.clamp(-maxVel, maxVel);
           _heading = _heading! + _headingVelocity * dt;
 
-          // Snap only when almost settled to avoid tiny oscillations.
-          if (error.abs() < 0.08 && _headingVelocity.abs() < 0.7) {
+          // Snap earlier once effectively settled so users don't wait on-table.
+          if (absError < 0.65 && _headingVelocity.abs() < 4.0) {
             _heading = target;
             _headingVelocity = 0.0;
           }
