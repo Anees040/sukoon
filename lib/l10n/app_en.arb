@@ -1,0 +1,337 @@
+{
+  "@@locale": "en",
+
+  "tabHome": "Home",
+  "tabTracker": "Tracker",
+  "tabQaza": "Qaza",
+  "tabQibla": "Qibla",
+  "tabSettings": "Settings",
+
+  "prayerFajr": "Fajr",
+  "prayerZuhr": "Zuhr",
+  "prayerAsr": "Asr",
+  "prayerMaghrib": "Maghrib",
+  "prayerIsha": "Isha",
+  "prayerWitr": "Witr",
+
+  "undo": "Undo",
+  "next": "Next",
+  "cancel": "Cancel",
+  "ok": "OK",
+  "endNow": "End now",
+  "save": "Save",
+  "retry": "Try again",
+
+  "homeNextPrayer": "Next prayer",
+  "homeAutoSilenceAt": "Auto-silent at {time} for {minutes} min",
+  "@homeAutoSilenceAt": {
+    "placeholders": {
+      "time": { "type": "String" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "homeSilencedUntil": "Silent until {time}",
+  "@homeSilencedUntil": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "homePermissionTitle": "Permissions needed",
+  "homePermissionBody": "Sukoon needs Do Not Disturb access to silence your phone at prayer times.",
+  "homeFixNow": "Fix now",
+  "masterTitle": "Auto-silent at prayer times",
+  "masterOffHint": "Nothing will be silenced while this is off.",
+  "masjidMode": "Masjid mode",
+  "masjidModeHint": "Silence right now \u2014 for jama'at",
+  "masjidSheetTitle": "Silence for how long?",
+  "masjidNeedAccess": "Do Not Disturb access is needed to silence your phone.",
+  "@masjidNeedAccess": {
+    "description": "Snackbar when Masjid mode can't start because DND access is not granted; the permission sheet opens right after."
+  },
+  "minutesFull": "{minutes} minutes",
+  "@minutesFull": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+
+  "notifSilenceTitle": "{prayer} \u2014 phone is silent",
+  "@notifSilenceTitle": {
+    "placeholders": { "prayer": { "type": "String" } }
+  },
+  "notifSilenceBody": "Rings again at {time}",
+  "@notifSilenceBody": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "notifPreAzanTitle": "{prayer} soon",
+  "@notifPreAzanTitle": {
+    "placeholders": { "prayer": { "type": "String" } }
+  },
+  "notifPreAzanBody": "{prayer} at {time}",
+  "@notifPreAzanBody": {
+    "placeholders": {
+      "prayer": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+  "notifReminderTitle": "Qaza reminder \ud83c\udf19",
+  "notifReminderBody": "A few minutes tonight will bring you closer.",
+
+  "primerTitle": "Assalamu alaikum \ud83d\udc4b",
+  "primerBody": "Sukoon silences your phone at every prayer time, automatically. It needs three permissions to work reliably.",
+  "primerDndTitle": "Do Not Disturb access",
+  "primerDndBody": "To silence your phone and restore it afterwards.",
+  "primerExactTitle": "Exact alarms",
+  "primerExactBody": "So silence starts exactly at azan time.",
+  "primerNotifTitle": "Notifications",
+  "primerNotifBody": "A small note while your phone is silent.",
+  "primerAllow": "Allow",
+  "primerDone": "Done",
+  "primerSkip": "Skip for now",
+  "androidOnlyNotice": "Sukoon works on Android only.",
+  "@androidOnlyNotice": {
+    "description": "Snackbar shown when a permission action is tapped in a non-Android preview (web/desktop)."
+  },
+
+  "batterySheetTitle": "One more thing \ud83d\udd0b",
+  "batterySheetBody": "Some phones stop background apps to save battery. Please allow Sukoon to run in the background so silence never fails.",
+  "batterySheetButton": "Allow background use",
+  "batterySheetLater": "Later",
+
+  "permSheetTitle": "Permissions",
+  "permDnd": "Do Not Disturb",
+  "permExact": "Exact alarms",
+  "permBattery": "Background (battery)",
+  "permNotif": "Notifications",
+  "permFix": "Fix",
+
+  "sectionSilent": "Auto-silent",
+  "sectionPrayerTimes": "Prayer times",
+  "sectionReminders": "Reminders",
+  "sectionOther": "Other",
+  "settingsSilenceDuration": "Silence duration",
+  "settingsSilenceNotif": "Show notification while silent",
+  "settingsCalcMethod": "Calculation method",
+  "methodKarachi": "Karachi (Pakistan default)",
+  "methodMwl": "Muslim World League",
+  "methodIsna": "ISNA (North America)",
+  "methodEgyptian": "Egyptian",
+  "settingsAsrMadhab": "Asr time",
+  "madhabHanafi": "Hanafi (later)",
+  "madhabShafi": "Shafi (earlier)",
+  "settingsLocation": "Location",
+  "settingsChangeCity": "Change city",
+  "settingsUseGps": "Use GPS",
+  "settingsGpsFailed": "Couldn't get location \u2014 check permission",
+  "settingsLanguage": "Language",
+  "langSystem": "System",
+  "settingsPreAzan": "Heads-up before azan",
+  "preAzanOff": "Off",
+  "settingsQazaReminder": "Nightly qaza reminder",
+  "settingsReminderTime": "Reminder time",
+  "settingsWitr": "Include Witr in qaza",
+  "settingsWitrHint": "Applies when you run the calculator again",
+  "settingsMinutesPerQaza": "Minutes per qaza prayer",
+  "settingsPermissions": "Permissions",
+  "aboutVersion": "Sukoon {version} \u2014 made with \u2764\ufe0f in Pakistan",
+  "@aboutVersion": {
+    "placeholders": { "version": { "type": "String" } }
+  },
+  "aboutDisclaimer": "Prayer times are calculated offline and can differ a few minutes from your local masjid \u2014 always follow your masjid for jama'at. Qaza counts are estimates, not rulings; for personal guidance please consult a scholar you trust.",
+  "@aboutDisclaimer": {
+    "description": "Religious disclaimer. TODO-URDU-REVIEW: have an imam review both languages before release."
+  },
+
+  "trackerStreakLabel": "Current streak",
+  "trackerBestLabel": "Best",
+  "trackerDays": "{days} days",
+  "@trackerDays": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "trackerCompletion": "{pct}% this month",
+  "@trackerCompletion": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "statusNone": "Mark",
+  "statusPrayed": "Prayed",
+  "statusJamaat": "Jama'at",
+  "statusMissed": "Missed",
+  "trackerPeriodDay": "Excused day",
+  "@trackerPeriodDay": {
+    "description": "Menstruation day marker \u2014 deliberately gentle wording. TODO-URDU-REVIEW."
+  },
+  "trackerPeriodHint": "Prayers are not counted on these days \u2014 your streak stays safe.",
+  "trackerMissedAdded": "1 {prayer} added to your qaza list",
+  "@trackerMissedAdded": {
+    "placeholders": { "prayer": { "type": "String" } }
+  },
+  "heatmapHint": "Tap any day to edit it",
+  "trackerLoadError": "Couldn't load your tracker.",
+
+  "qazaEmptyTitle": "How many prayers do I owe?",
+  "qazaEmptyBody": "Answer a few gentle questions and Sukoon will estimate your qaza-e-umri \u2014 then help you repay it, day by day.",
+  "qazaStart": "Start the calculator",
+  "qazaManualStart": "Enter counts manually",
+  "qazaManualTitle": "Enter qaza manually",
+  "qazaManualHint": "Type how many of each prayer you owe. You can adjust these anytime.",
+  "qazaAllDone": "All caught up \u2014 alhamdulillah! \ud83c\udf89",
+  "qazaRecalc": "Recalculate",
+  "qazaOf": "of {total}",
+  "@qazaOf": {
+    "placeholders": { "total": { "type": "int" } }
+  },
+  "qazaRepaidPct": "{pct}% repaid",
+  "@qazaRepaidPct": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "qazaRepaidAction": "+{count} {prayer} repaid",
+  "@qazaRepaidAction": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "prayer": { "type": "String" }
+    }
+  },
+  "qazaLongPressHint": "Tap +1 \u00b7 long-press +5",
+  "achievementsTitle": "Achievements",
+  "achUnlockedSnack": "Unlocked: {title} \ud83c\udfc5",
+  "@achUnlockedSnack": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+
+  "wizTitle": "Qaza calculator",
+  "wizGenderQ": "Calculate for\u2026",
+  "genderMale": "Male",
+  "genderFemale": "Female",
+  "wizBirthQ": "When were you born?",
+  "wizPickDate": "Pick a date",
+  "wizBulughQ": "When did prayer become obligatory for you (bulugh)?",
+  "@wizBulughQ": {
+    "description": "Fiqh wording. TODO-URDU-REVIEW."
+  },
+  "bulughRemembered": "I remember roughly when",
+  "bulughRememberedHint": "You'll pick the date on the next step",
+  "bulughDeemed": "Not sure \u2014 use 15 lunar years",
+  "bulughDeemedHint": "The common assumption when nothing is remembered",
+  "bulughCautious": "Be cautious \u2014 earliest age",
+  "bulughCautiousHint": "12 lunar years (male) / 9 (female): counts the most",
+  "wizBulughDateQ": "Around when was it?",
+  "wizRegularQ": "Since when have you prayed all five daily?",
+  "wizRegularNotYet": "Not regular yet \u2014 count until today",
+  "wizRegularPick": "I became regular on a date",
+  "wizAdherenceQ": "During the gap years, how much did you actually pray?",
+  "adherencePreset0": "Almost none",
+  "adherencePreset25": "About a quarter",
+  "adherencePreset50": "About half",
+  "adherencePreset75": "Most of them",
+  "wizAdherenceValue": "{pct}% of prayers",
+  "@wizAdherenceValue": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "wizFemaleQ": "Monthly & post-birth days",
+  "wizFemaleHint": "Prayers were not owed on these days, so they are deducted.",
+  "@wizFemaleHint": {
+    "description": "Hayd/nifas deduction. TODO-URDU-REVIEW."
+  },
+  "wizHaydLabel": "Average period days per month",
+  "wizBirthsLabel": "Number of births",
+  "wizNifasLabel": "Nifas days per birth",
+  "wizWitrQ": "Include Witr?",
+  "wizWitrYes": "Include",
+  "wizWitrNo": "Don't include",
+  "wizWitrHint": "In Hanafi fiqh, missed Witr is also made up",
+  "@wizWitrHint": {
+    "description": "Hanafi ruling. TODO-URDU-REVIEW."
+  },
+  "wizResultTitle": "Your estimate",
+  "wizTotalLabel": "total prayers",
+  "wizEditHint": "Adjust any number \u2014 you know your history best.",
+  "wizViewCalc": "How was this calculated?",
+  "wizDisclaimer": "This is an estimate to help you begin \u2014 not a religious ruling. For your personal situation, please consult a scholar you trust.",
+  "@wizDisclaimer": {
+    "description": "Religious disclaimer. TODO-URDU-REVIEW: imam review required."
+  },
+  "wizConfirm": "Save & begin",
+
+  "expTitle": "Calculation breakdown",
+  "expBulugh": "Obligation began",
+  "expGapEnd": "Counted until",
+  "expGapDays": "Days in between",
+  "expHayd": "Minus period days (est.)",
+  "expNifas": "Minus nifas days",
+  "expObligated": "Days prayers were owed",
+  "expAdherence": "You prayed about {pct}%",
+  "@expAdherence": {
+    "placeholders": { "pct": { "type": "int" } }
+  },
+  "expOwedDays": "Missed days (rounded up)",
+  "expPerPrayer": "Owed for each of {types} prayers",
+  "@expPerPrayer": {
+    "placeholders": { "types": { "type": "int" } }
+  },
+  "expNote": "Averages used: lunar year = 354.367 days, month = 30.44 days. Rounding is always upward, to stay on the safe side.",
+
+  "planTitle": "Daily plan",
+  "planSetsHint": "1 set = one qaza of each prayer you owe",
+  "planCustom": "Custom",
+  "planFinishIn": "Done in about {days} days",
+  "@planFinishIn": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "planFinishDate": "around {date}",
+  "@planFinishDate": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "planMinutes": "\u2248 {minutes} min/day",
+  "@planMinutes": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "planTodayProgress": "Today: {done}/{target} sets",
+  "@planTodayProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "target": { "type": "int" }
+    }
+  },
+  "planStreakLabel": "{days}-day plan streak",
+  "@planStreakLabel": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+
+  "achFirstQaza": "First step",
+  "achStreak7": "One week strong",
+  "achStreak30": "Thirty days",
+  "achStreak100": "Hundred days",
+  "achTotal100": "100 prayers",
+  "achTotal500": "500 prayers",
+  "achTotal1000": "1,000 prayers",
+  "achTotal5000": "5,000 prayers",
+  "achPct10": "10% cleared",
+  "achPct25": "Quarter done",
+  "achPct50": "Halfway there",
+  "achPct75": "75% cleared",
+  "achPct100": "All repaid",
+
+  "qiblaFacing": "Facing qibla",
+  "qiblaDegrees": "{degrees}\u00b0 to qibla",
+  "@qiblaDegrees": {
+    "placeholders": { "degrees": { "type": "int" } }
+  },
+  "qiblaCalibrate": "Move your phone in a figure-8 to calibrate the compass",
+  "qiblaNoSensor": "Compass sensor not available on this phone",
+  "qiblaStaticInfo": "Qibla is {bearing}\u00b0 from north",
+  "@qiblaStaticInfo": {
+    "placeholders": { "bearing": { "type": "int" } }
+  },
+  "qiblaFromCity": "from {city}",
+  "@qiblaFromCity": {
+    "placeholders": { "city": { "type": "String" } }
+  },
+
+  "citiesTitle": "Prayer times \u2014 Pakistan",
+  "citiesSearchHint": "Search city (English or \u0627\u0631\u062f\u0648)",
+  "citiesFavorites": "Favorites",
+  "citiesAll": "All cities",
+  "citySetLocation": "Use for my prayer times",
+  "citySetDone": "Prayer times now use {city}",
+  "@citySetDone": {
+    "placeholders": { "city": { "type": "String" } }
+  },
+  "cityToday": "Today",
+  "cityUpcoming": "Coming days"
+}

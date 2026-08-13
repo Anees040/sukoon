@@ -1,0 +1,10 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - lib/l10n/gen/**
+    - build/**
+
+linter:
+  rules:
+    prefer_single_quotes: true

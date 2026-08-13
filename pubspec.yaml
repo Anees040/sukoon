@@ -1,0 +1,85 @@
+name: sukoon
+description: "Sukoon (\u0633\u06a9\u0648\u0646) \u2014 namaz times, auto-silent at prayer times, namaz & qaza tracker, qibla. Offline, private, no ads."
+publish_to: "none"
+
+# versionName+versionCode. Bump to 0.9.1+2, 1.0.0+3 etc. for later uploads.
+version: 0.9.1+2
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  # Pinned by flutter_localizations; 'any' avoids version conflicts.
+  intl: any
+
+  # Prayer time math (offline). Batoul Apps port.
+  adhan: ^2.0.0-nullsafety.2
+  # Settings & small state.
+  shared_preferences: ^2.3.2
+  # Tracker + qaza history.
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  # One-time coarse location.
+  geolocator: ^13.0.1
+  # Magnetometer + accelerometer for qibla compass.
+  sensors_plus: ^6.1.0
+  # Code-driven animations (no Lottie/GIF \u2014 size budget).
+  flutter_animate: ^4.5.0
+  confetti: ^0.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.1
+  # DEV-ONLY: lets sqflite run in `flutter run -d chrome` for fast UI testing.
+  # Used only behind a conditional import (lib/data/web_db_ffi.dart); the
+  # Android release never compiles or bundles it. Not a shipping dependency.
+  sqflite_common_ffi_web: ^0.4.0
+
+flutter:
+  generate: true # gen_l10n from lib/l10n/*.arb (see l10n.yaml)
+  uses-material-design: true
+  assets:
+    - assets/data/pk_cities.json
+    - assets/illustrations/
+
+  # Noto Nastaliq Urdu — proper Nastaliq script for Pakistani readers.
+  # lib/theme.dart targets 'NotoNastaliqUrdu' as the Urdu family + fallback.
+  # Only Regular + Bold are declared, so only those two are bundled (~1 MB).
+  # The Medium/SemiBold .ttf files in assets/fonts/ are undeclared → NOT
+  # bundled (no app-size cost); delete them for repo tidiness. Add OFL.txt.
+  fonts:
+    - family: NotoNastaliqUrdu
+      fonts:
+        - asset: assets/fonts/NotoNastaliqUrdu-Regular.ttf
+        - asset: assets/fonts/NotoNastaliqUrdu-Bold.ttf
+          weight: 700
+
+# ---- launcher icon (run: dart run flutter_launcher_icons) ----
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/brand/icon.png"
+  adaptive_icon_background: "#011519"
+  adaptive_icon_foreground: "assets/brand/icon_foreground.png"
+  adaptive_icon_monochrome: "assets/brand/icon_monochrome.png"
+
+# ---- splash (run: dart run flutter_native_splash:create) ----
+# Legacy (Android <=11): full mark WITH the "SUKOON سکون" text, centred on the
+# brand background. Android 12+ masks the splash into a circle, so the compact
+# crescent mark (no text) is used there to avoid clipping. #011519 is the
+# splash image's own background colour, so the image blends seamlessly.
+flutter_native_splash:
+  color: "#011519"
+  image: assets/brand/splash.png
+  android: true
+  ios: false
+  android_12:
+    color: "#011519"
+    image: assets/brand/splash_logo.png

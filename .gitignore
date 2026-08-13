@@ -1,0 +1,28 @@
+# Flutter/Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+pubspec.lock
+lib/l10n/gen/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/.cxx/
+
+# SECRETS \u2014 never commit
+key.properties
+*.jks
+*.keystore
+
+# OS
+.DS_Store
+Thumbs.db
