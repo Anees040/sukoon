@@ -29,6 +29,8 @@ class _QiblaScreenState extends State<QiblaScreen>
   /// Continuous (unwrapped) heading for buttery rotation — never spins
   /// backwards across the 359°→0° seam.
   double? _heading;
+  double _headingVelocity = 0.0; // deg/s for damped visual motion
+  int? _lastTickUs;
   bool _noSensor = false;
   bool _wasAligned = false;
   final List<double> _recent = [];
@@ -60,8 +62,36 @@ class _QiblaScreenState extends State<QiblaScreen>
 
         if (!mounted) return;
         setState(() {
-          // Follow the shortest rotation path without delayed feel.
-          _heading = _heading == null ? h : _heading! + angleDelta(_heading!, h);
+          final nowUs = DateTime.now().microsecondsSinceEpoch;
+          if (_heading == null) {
+            _heading = h;
+            _headingVelocity = 0.0;
+            _lastTickUs = nowUs;
+            return;
+          }
+
+          final prevUs = _lastTickUs ?? nowUs;
+          _lastTickUs = nowUs;
+          var dt = (nowUs - prevUs) / 1000000.0;
+          dt = dt.clamp(0.008, 0.05);
+
+          // Convert wrapped heading target into a nearby unwrapped target.
+          final target = _heading! + angleDelta(_heading!, h);
+          final error = target - _heading!;
+
+          // Critically damped spring for stable professional compass feel.
+          const k = 22.0; // stiffness
+          const c = 10.8; // damping
+          final accel = k * error - c * _headingVelocity;
+          _headingVelocity += accel * dt;
+          _headingVelocity = _headingVelocity.clamp(-220.0, 220.0);
+          _heading = _heading! + _headingVelocity * dt;
+
+          // Snap only when almost settled to avoid tiny oscillations.
+          if (error.abs() < 0.08 && _headingVelocity.abs() < 0.7) {
+            _heading = target;
+            _headingVelocity = 0.0;
+          }
         });
       },
       onError: (Object _) {

@@ -12,20 +12,24 @@ import 'package:sukoon/qibla/qibla_math.dart';
 /// Emits smoothed headings in degrees from magnetic north [0, 360).
 /// Adds error 'no_sensor' when the device lacks usable sensors.
 class CompassService {
-  static const _alpha = 0.20; // More responsive while still smooth
-  static const _vecAlpha = 0.32; // Faster sensor convergence for less lag
+  static const _alpha = 0.34; // Smoother magnetic baseline
+  static const _vecAlpha = 0.42; // Stable LPF without heavy lag
+  static const _magCorrection = 0.11; // Softer correction, less snap-back
   static const _sensorTimeout = Duration(seconds: 3);
 
   Stream<double> headingStream() {
     late StreamController<double> controller;
     StreamSubscription<AccelerometerEvent>? accSub;
     StreamSubscription<MagnetometerEvent>? magSub;
+    StreamSubscription<GyroscopeEvent>? gyroSub;
     Timer? firstEventTimer;
 
     double? ax, ay, az;
     double? mx, my, mz;
-    double? sSmooth, cSmooth;
-    double? lastHeading;
+    double? sMagSmooth, cMagSmooth;
+    double? headingEstimate;
+    double? lastEmitHeading;
+    int? lastGyroUs;
     var gotAny = false;
     var errored = false;
 
@@ -33,6 +37,34 @@ class CompassService {
       if (errored || controller.isClosed) return;
       errored = true;
       controller.addError('no_sensor');
+    }
+
+    void emitHeadingIfNeeded(double value) {
+      if (controller.isClosed) return;
+      if (lastEmitHeading != null &&
+          angleDelta(lastEmitHeading!, value).abs() < 0.05) {
+        return;
+      }
+      lastEmitHeading = value;
+      controller.add(normalizeDegrees(value));
+    }
+
+    void onGyro(GyroscopeEvent g) {
+      if (headingEstimate == null || controller.isClosed) return;
+      final nowUs = DateTime.now().microsecondsSinceEpoch;
+      if (lastGyroUs == null) {
+        lastGyroUs = nowUs;
+        return;
+      }
+      final dt = (nowUs - lastGyroUs!) / 1000000.0;
+      lastGyroUs = nowUs;
+      if (dt <= 0 || dt > 0.25) return;
+
+      // Positive z rotates CCW; heading from north increases clockwise.
+      // Slightly scale down gyro contribution for calmer motion.
+      final deltaDeg = -(g.z * 180.0 / math.pi) * dt * 0.80;
+      headingEstimate = normalizeDegrees(headingEstimate! + deltaDeg);
+      emitHeadingIfNeeded(headingEstimate!);
     }
 
     void onMag(MagnetometerEvent m) {
@@ -69,20 +101,26 @@ class CompassService {
 
       final azimuth = math.atan2(hy, myv);
 
-      // Circular EMA (smooth sin/cos separately to survive the 360→0 wrap).
+      // Circular EMA on magnetic absolute heading.
       final s = math.sin(azimuth), c = math.cos(azimuth);
-      sSmooth = sSmooth == null ? s : _alpha * s + (1 - _alpha) * sSmooth!;
-      cSmooth = cSmooth == null ? c : _alpha * c + (1 - _alpha) * cSmooth!;
+      sMagSmooth =
+          sMagSmooth == null ? s : _alpha * s + (1 - _alpha) * sMagSmooth!;
+      cMagSmooth =
+          cMagSmooth == null ? c : _alpha * c + (1 - _alpha) * cMagSmooth!;
 
-      final heading =
-          normalizeDegrees(math.atan2(sSmooth!, cSmooth!) * 180.0 / math.pi);
+      final magHeading = normalizeDegrees(
+        math.atan2(sMagSmooth!, cMagSmooth!) * 180.0 / math.pi,
+      );
 
-      // Ignore only ultra-tiny jitter.
-      if (lastHeading != null && angleDelta(lastHeading!, heading).abs() < 0.05) {
-        return;
+      if (headingEstimate == null) {
+        headingEstimate = magHeading;
+      } else {
+        // Complementary correction keeps gyro drift bounded while remaining snappy.
+        headingEstimate = normalizeDegrees(
+          headingEstimate! + angleDelta(headingEstimate!, magHeading) * _magCorrection,
+        );
       }
-      lastHeading = heading;
-      controller.add(heading);
+      emitHeadingIfNeeded(headingEstimate!);
     }
 
     controller = StreamController<double>(
@@ -106,6 +144,11 @@ class CompassService {
             onError: (Object _) => fail(),
             cancelOnError: false,
           );
+          gyroSub = gyroscopeEventStream().listen(
+            onGyro,
+            onError: (Object _) {},
+            cancelOnError: false,
+          );
         } catch (_) {
           fail();
         }
@@ -114,6 +157,7 @@ class CompassService {
         firstEventTimer?.cancel();
         await accSub?.cancel();
         await magSub?.cancel();
+        await gyroSub?.cancel();
       },
     );
 
