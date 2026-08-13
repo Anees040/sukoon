@@ -1,128 +1,79 @@
 # Sukoon (سکون)
 
-Sukoon is an Android-first Flutter application for Pakistani Muslims that provides offline prayer support tools with strong privacy defaults and bilingual experience in English and Urdu.
+Sukoon is an Android Flutter application for Pakistani Muslims focused on private, offline-first daily prayer support.
 
-It combines practical daily workflows in one place:
-- Prayer-time based auto-silence with safe restore behavior
-- Offline prayer times for Pakistani cities
-- Daily namaz tracking with streak and heatmap views
-- Qaza-e-umri estimation and planning tools
-- Qibla direction support
+## Overview
 
-## Product Scope
+Sukoon brings essential daily workflows into one app:
+1. Prayer-time based auto-silent mode with safe restore behavior.
+2. Offline prayer times for Pakistani cities.
+3. Namaz tracking with streak and heatmap views.
+4. Qaza-e-umri estimation and repayment planning tools.
+5. Qibla direction support.
 
-Current scope is intentionally focused and lightweight:
-- Platform: Android
-- Network: No backend, no account system, no analytics dependency
-- Monetization: No ads
-- Religious content policy: No Quran or Hadith text in-app
-
-## Core Features
+## Key Features
 
 1. Auto-Silent at Prayer Time
-- Enables alarms-only DND level at prayer start
-- Restores the user's previous interruption state after configured duration (15/20/30 min)
-- Includes one-tap Masjid Mode
-- Works through reboot and timezone changes using native alarm receivers
+- Activates alarms-only DND level at prayer start.
+- Restores the previous interruption state after 15, 20, or 30 minutes.
+- Supports one-tap Masjid Mode.
+- Continues working across reboot and timezone changes.
 
 2. Offline Prayer Times
-- Adhan-based prayer calculations
-- Karachi method default, Hanafi Asr default
-- City dataset focused on Pakistan
+- Adhan-based prayer calculations.
+- Karachi calculation method by default.
+- Hanafi Asr setting by default.
+- Pakistan-focused city dataset.
 
 3. Namaz Tracker
-- Daily prayer logging (including jamaat and missed)
-- Streak tracking
-- Monthly heatmap view
-- Period mode support
+- Daily prayer logging with jamaat and missed states.
+- Streak tracking and heatmap visualization.
+- Period mode support.
 
 4. Qaza-e-Umri Planner
-- Guided estimate flow with editable assumptions
-- Ledger and repayment planning view
-- Achievement progression for consistency motivation
+- Guided estimate flow with editable assumptions.
+- Ledger and repayment planning tools.
 
-5. Qibla Utilities
-- Compass-based direction support
-- Mathematical bearing fallback
+5. Qibla Support
+- Compass-based direction support.
+- Mathematical bearing fallback.
 
-6. Full Localization
-- English and Urdu user experience
-- RTL-aware Urdu interface support
+6. Localization
+- Full English and Urdu experience.
+- RTL-aware Urdu interface.
 
-## Technical Architecture
+## Technical Summary
 
-Sukoon follows a split-responsibility architecture:
-- Flutter (Dart) layer handles UI, prayer math integration, local app state, and domain features
-- Native Android (Kotlin) layer handles exact alarms, DND switching, and background-safe receivers
+Architecture follows clear separation of responsibilities:
+- Flutter (Dart): UI, domain logic, local data, and feature modules.
+- Android (Kotlin): exact alarms, DND handling, and background receivers.
 
-High-level flow:
-1. Dart calculates upcoming schedule payload.
-2. Payload is synced to native storage through MethodChannel bridge.
-3. Native receivers execute exact-time behaviors even when the Flutter engine is not active.
-4. Original interruption filter is restored safely after session end.
+Schedule synchronization is performed through MethodChannels, enabling exact-time native behavior even when the Flutter engine is not active.
 
-## Repository Structure
+## Scope and Policies
 
-- lib: Flutter application source code (features, domain modules, UI, localization)
-- android: Native Android implementation (channels, alarms, receivers)
-- assets: City data, fonts, and visual assets
-- docs: Verification plans, release notes, content policy, and supporting documentation
-- test: Unit tests for planner logic, qibla math, schedule payloads, and localization parity
+- Platform: Android.
+- Data model: local-first; no backend required for core features.
+- Monetization: no ads.
+- Content policy: no Quran or Hadith text inside the app.
 
-## Local Setup
+## Repository Layout
 
-Prerequisites:
-- Flutter SDK 3.35.x (or project-compatible stable version)
-- Android SDK and Android platform tools
-- A physical Android device (recommended for DND and exact-alarm behavior validation)
+- lib: Flutter application source.
+- android: native Android integration and receivers.
+- assets: fonts, brand assets, and city data.
+- docs: verification, release, and policy documentation.
+- test: unit and logic tests.
 
-Basic setup:
-1. Clone repository.
-2. Run dependency install.
-3. Generate localization files.
-4. Run static analysis and tests.
+## Development Notes
 
-Commands:
-- flutter pub get
-- flutter gen-l10n
-- flutter analyze
-- flutter test
-
-## Build and Release
-
-Debug run on connected device:
-- flutter run -d <device-id>
-
-Release APK build:
-- flutter build apk --release
-
-Play Store AAB build:
-- flutter build appbundle --release
-
-Size analysis:
-- flutter build appbundle --release --analyze-size
-
-## Privacy and Permissions
-
-The app is designed with local-first behavior and minimal data exposure:
-- No remote backend required for core operation
-- Local persistence for settings and user activity logs
-- Runtime behavior depends on explicit user-granted Android capabilities (for example DND access and exact alarms)
+- Current implementation is under active verification and hardening.
+- Detailed project status is maintained in docs/PROJECT_STATE.md.
+- Verification waves are documented in docs/VERIFY_PLAN.md.
+- Environment and setup guidance is documented in INSTALL.md.
 
 ## Screenshots
 
-Screenshots will be added after device-side release validation.
+Screenshots will be added after release-mode device validation.
 
-## Current Development Status
 
-The codebase is under active verification and hardening. For detailed wave-by-wave technical status and acceptance criteria, refer to:
-- docs/PROJECT_STATE.md
-- docs/VERIFY_PLAN.md
-- INSTALL.md
-
-## Contribution and Quality Notes
-
-- Keep changes scoped and test-backed
-- Prefer minimal-risk fixes over broad refactors
-- Preserve localization parity across English and Urdu
-- Maintain strict Android runtime safety checks for permissions and scheduling
