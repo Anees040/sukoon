@@ -12,7 +12,8 @@ import 'package:sukoon/qibla/qibla_math.dart';
 /// Emits smoothed headings in degrees from magnetic north [0, 360).
 /// Adds error 'no_sensor' when the device lacks usable sensors.
 class CompassService {
-  static const _alpha = 0.15; // EMA factor — stable but responsive
+  static const _alpha = 0.20; // More responsive while still smooth
+  static const _vecAlpha = 0.32; // Faster sensor convergence for less lag
   static const _sensorTimeout = Duration(seconds: 3);
 
   Stream<double> headingStream() {
@@ -22,7 +23,9 @@ class CompassService {
     Timer? firstEventTimer;
 
     double? ax, ay, az;
+    double? mx, my, mz;
     double? sSmooth, cSmooth;
+    double? lastHeading;
     var gotAny = false;
     var errored = false;
 
@@ -36,9 +39,15 @@ class CompassService {
       if (ax == null || controller.isClosed) return;
       gotAny = true;
 
+      // Low-pass magnetometer readings.
+      mx = mx == null ? m.x : mx! + _vecAlpha * (m.x - mx!);
+      my = my == null ? m.y : my! + _vecAlpha * (m.y - my!);
+      mz = mz == null ? m.z : mz! + _vecAlpha * (m.z - mz!);
+      if (mx == null || my == null || mz == null) return;
+
       // Android SensorManager.getRotationMatrix, reduced to azimuth:
       // H = E × A (magnetic × gravity), M = A × H, azimuth = atan2(Hy, My).
-      final ex = m.x, ey = m.y, ez = m.z;
+      final ex = mx!, ey = my!, ez = mz!;
       final gx = ax!, gy = ay!, gz = az!;
 
       var hx = ey * gz - ez * gy;
@@ -52,12 +61,13 @@ class CompassService {
 
       final normA = math.sqrt(gx * gx + gy * gy + gz * gz);
       if (normA < 0.1) return;
-      final axn = gx / normA, azn = gz / normA;
+      final axn = gx / normA;
+      final azn = gz / normA;
 
-      // M = A × H — only the y component is needed for azimuth.
-      final my = azn * hx - axn * hz;
+      // M = A × H
+      final myv = azn * hx - axn * hz;
 
-      final azimuth = math.atan2(hy, my);
+      final azimuth = math.atan2(hy, myv);
 
       // Circular EMA (smooth sin/cos separately to survive the 360→0 wrap).
       final s = math.sin(azimuth), c = math.cos(azimuth);
@@ -66,6 +76,12 @@ class CompassService {
 
       final heading =
           normalizeDegrees(math.atan2(sSmooth!, cSmooth!) * 180.0 / math.pi);
+
+      // Ignore only ultra-tiny jitter.
+      if (lastHeading != null && angleDelta(lastHeading!, heading).abs() < 0.05) {
+        return;
+      }
+      lastHeading = heading;
       controller.add(heading);
     }
 
@@ -77,9 +93,10 @@ class CompassService {
         try {
           accSub = accelerometerEventStream().listen(
             (e) {
-              ax = e.x;
-              ay = e.y;
-              az = e.z;
+              // Low-pass gravity vector.
+              ax = ax == null ? e.x : ax! + _vecAlpha * (e.x - ax!);
+              ay = ay == null ? e.y : ay! + _vecAlpha * (e.y - ay!);
+              az = az == null ? e.z : az! + _vecAlpha * (e.z - az!);
             },
             onError: (Object _) => fail(),
             cancelOnError: false,

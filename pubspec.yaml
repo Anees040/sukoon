@@ -27,6 +27,8 @@ dependencies:
   geolocator: ^13.0.1
   # Magnetometer + accelerometer for qibla compass.
   sensors_plus: ^6.1.0
+  # Tiny dependency to render one offline SVG on Qibla screen without raster bloat.
+  flutter_svg: ^2.0.17
   # Code-driven animations (no Lottie/GIF \u2014 size budget).
   flutter_animate: ^4.5.0
   confetti: ^0.8.0

@@ -1,0 +1,67 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="topGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#666666"/>
+      <stop offset="0.55" stop-color="#3E3E3E"/>
+      <stop offset="1" stop-color="#1F1F1F"/>
+    </linearGradient>
+    <linearGradient id="leftGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2C2C2C"/>
+      <stop offset="0.65" stop-color="#151515"/>
+      <stop offset="1" stop-color="#0A0A0A"/>
+    </linearGradient>
+    <linearGradient id="rightGrad" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4B4B4B"/>
+      <stop offset="0.6" stop-color="#232323"/>
+      <stop offset="1" stop-color="#111111"/>
+    </linearGradient>
+    <linearGradient id="goldBand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C88422"/>
+      <stop offset="0.35" stop-color="#F0C766"/>
+      <stop offset="0.7" stop-color="#D99C36"/>
+      <stop offset="1" stop-color="#A96B16"/>
+    </linearGradient>
+    <linearGradient id="goldLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFE9A9"/>
+      <stop offset="1" stop-color="#E0B65D"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="32%" cy="28%" r="58%">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.23"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="drop" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#drop)">
+    <!-- Top plane -->
+    <polygon points="128,24 52,60 128,92 204,60" fill="url(#topGrad)"/>
+    <polygon points="128,30 62,61 128,88 194,61" fill="#5A5A5A" opacity="0.38"/>
+
+    <!-- Left and right faces -->
+    <polygon points="52,60 52,182 128,224 128,92" fill="url(#leftGrad)"/>
+    <polygon points="204,60 204,182 128,224 128,92" fill="url(#rightGrad)"/>
+
+    <!-- Kiswa highlights and folds -->
+    <path d="M66 92 L78 98 L78 204 L66 198 Z" fill="#FFFFFF" opacity="0.06"/>
+    <path d="M178 96 L190 90 L190 196 L178 202 Z" fill="#FFFFFF" opacity="0.05"/>
+    <path d="M128 96 L138 101 L138 217 L128 222 Z" fill="#FFFFFF" opacity="0.04"/>
+
+    <!-- Gold belt -->
+    <polygon points="52,102 128,130 204,102 204,122 128,150 52,122" fill="url(#goldBand)"/>
+    <polygon points="52,102 128,130 204,102 204,105 128,133 52,105" fill="url(#goldLine)" opacity="0.78"/>
+    <polygon points="52,119 128,147 204,119 204,122 128,150 52,122" fill="#9B6317" opacity="0.62"/>
+
+    <!-- Subtle decorative panels -->
+    <rect x="76" y="142" width="32" height="40" rx="2" fill="#D8A84C" opacity="0.12"/>
+    <rect x="112" y="156" width="32" height="48" rx="2" fill="#D8A84C" opacity="0.11"/>
+    <rect x="148" y="146" width="32" height="42" rx="2" fill="#D8A84C" opacity="0.12"/>
+
+    <!-- Global sheen -->
+    <polygon points="128,24 52,60 52,182 128,224 204,182 204,60" fill="url(#sheen)"/>
+
+    <!-- Crisp outline -->
+    <polygon points="128,24 52,60 52,182 128,224 204,182 204,60" fill="none" stroke="#F9D47B" stroke-opacity="0.2" stroke-width="1.2"/>
+  </g>
+</svg>

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:sukoon/core/prefs.dart';
 import 'package:sukoon/features/common/widgets.dart';
@@ -59,9 +60,8 @@ class _QiblaScreenState extends State<QiblaScreen>
 
         if (!mounted) return;
         setState(() {
-          // Follow the shortest rotation path (continuous heading).
-          _heading =
-              _heading == null ? h : _heading! + angleDelta(_heading!, h);
+          // Follow the shortest rotation path without delayed feel.
+          _heading = _heading == null ? h : _heading! + angleDelta(_heading!, h);
         });
       },
       onError: (Object _) {
@@ -90,14 +90,14 @@ class _QiblaScreenState extends State<QiblaScreen>
           Text(l10n.tabQibla, style: t.titleLarge),
           const SizedBox(height: 16),
           if (_noSensor)
-            _StaticFallback(qibla: qibla)
+            _StaticFallback(qibla: qibla, pulse: _pulse)
           else if (_heading == null)
             const Padding(
               padding: EdgeInsets.only(top: 96),
               child: Center(child: CircularProgressIndicator()),
             )
           else ...[
-            _Dial(heading: _heading!, qibla: qibla, pulse: _pulse),
+            _Dial(heading: _heading!, qibla: qibla, pulse: _pulse, live: true),
             const SizedBox(height: 20),
             _Readout(heading: _heading!, qibla: qibla),
             const SizedBox(height: 16),
@@ -130,28 +130,37 @@ class _QiblaScreenState extends State<QiblaScreen>
 }
 
 class _Dial extends StatelessWidget {
-  const _Dial({required this.heading, required this.qibla, required this.pulse});
+  const _Dial({
+    required this.heading,
+    required this.qibla,
+    required this.pulse,
+    required this.live,
+  });
 
   final double heading;
   final double qibla;
   final AnimationController pulse;
+  final bool live;
 
   @override
   Widget build(BuildContext context) {
-    final aligned = angleDelta(heading, qibla).abs() <= 3.0;
+    final aligned = live && angleDelta(heading, qibla).abs() <= 3.0;
+    const dialSize = 320.0;
     return Center(
       child: AnimatedBuilder(
         animation: pulse,
         builder: (context, _) {
           final glow = aligned ? 0.25 + 0.25 * pulse.value : 0.0;
           return Container(
-            width: 300,
-            height: 300,
+            width: dialSize,
+            height: dialSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: SukoonColors.surface,
               border: Border.all(
-                color: aligned ? SukoonColors.lime : SukoonColors.stroke,
+                color: aligned
+                    ? SukoonColors.lime
+                    : (live ? SukoonColors.stroke : SukoonColors.accentDim),
                 width: aligned ? 2.4 : 1.2,
               ),
               boxShadow: aligned
@@ -171,22 +180,41 @@ class _Dial extends StatelessWidget {
                 // current facing direction.
                 Transform.rotate(
                   angle: -heading * math.pi / 180.0,
-                  child: CustomPaint(
-                    size: const Size(300, 300),
-                    painter: _RosePainter(qibla: qibla, aligned: aligned),
+                  child: SizedBox(
+                    width: dialSize,
+                    height: dialSize,
+                    child: Stack(
+                      children: [
+                        CustomPaint(
+                          size: const Size(dialSize, dialSize),
+                          painter: _RosePainter(qibla: qibla, aligned: aligned),
+                        ),
+                        _RingQiblaMarker(qibla: qibla, dialSize: dialSize),
+                      ],
+                    ),
                   ),
                 ),
                 // Fixed pointer at the top (what you're facing).
                 const Positioned(
                   top: 6,
-                  child: Icon(Icons.arrow_drop_down,
+                  child: Icon(Icons.keyboard_arrow_up,
                       size: 30, color: SukoonColors.accent),
                 ),
                 // Center needle pointing up.
                 Icon(
                   Icons.navigation,
                   size: 52,
-                  color: aligned ? SukoonColors.lime : SukoonColors.accent,
+                  color: aligned
+                      ? SukoonColors.lime
+                      : (live ? SukoonColors.accent : SukoonColors.textSecondary),
+                ),
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: SukoonColors.accent,
+                  ),
                 ),
               ],
             ),
@@ -210,12 +238,17 @@ class _Readout extends StatelessWidget {
     final shown = normalizeDegrees(heading);
     final diff = angleDelta(shown, qibla);
     final aligned = diff.abs() <= 3.0;
+    final shownCardinal = _bearingCardinal(shown);
+    final qiblaCardinal = _bearingCardinal(qibla);
 
     return Column(
       children: [
-        Text('${shown.round()}°',
+        Text('${shown.round()}° $shownCardinal',
             style: t.displayMedium?.copyWith(
                 color: aligned ? SukoonColors.lime : SukoonColors.text)),
+        const SizedBox(height: 6),
+        Text('${qibla.round()}° $qiblaCardinal',
+            style: t.titleMedium?.copyWith(color: SukoonColors.textSecondary)),
         const SizedBox(height: 4),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
@@ -252,15 +285,19 @@ class _Readout extends StatelessWidget {
                   ],
                 ),
         ),
+        const SizedBox(height: 12),
+        Text(l10n.qiblaFromCity(Prefs.locationLabel),
+            style: t.bodySmall?.copyWith(color: SukoonColors.textSecondary)),
       ],
     );
   }
 }
 
 class _StaticFallback extends StatelessWidget {
-  const _StaticFallback({required this.qibla});
+  const _StaticFallback({required this.qibla, required this.pulse});
 
   final double qibla;
+  final AnimationController pulse;
 
   @override
   Widget build(BuildContext context) {
@@ -268,21 +305,35 @@ class _StaticFallback extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return Column(
       children: [
-        EmptyState(
-          icon: Icons.explore_off,
-          title: l10n.qiblaNoSensor,
+        SectionCard(
+          borderColor: SukoonColors.warning,
+          child: Row(
+            children: [
+              const Icon(Icons.explore_off, color: SukoonColors.warning),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(l10n.qiblaNoSensor,
+                    style: t.titleSmall?.copyWith(color: SukoonColors.text)),
+              ),
+            ],
+          ),
         ),
+        const SizedBox(height: 16),
+        _Dial(heading: 0, qibla: qibla, pulse: pulse, live: false),
+        const SizedBox(height: 20),
         SectionCard(
           child: Column(
             children: [
               // Drawn Kaaba marker — no emoji.
-              CustomPaint(
-                size: const Size(44, 44),
-                painter: _KaabaPainter(size: 44),
-              ),
+              const _QiblaHeroIcon(size: 44),
               const SizedBox(height: 8),
+              Text('${qibla.round()}° ${_bearingCardinal(qibla)}',
+                  style: t.headlineSmall, textAlign: TextAlign.center),
+              const SizedBox(height: 4),
               Text(l10n.qiblaStaticInfo(qibla.round()),
-                  style: t.titleMedium, textAlign: TextAlign.center),
+                  style: t.bodyMedium
+                      ?.copyWith(color: SukoonColors.textSecondary),
+                  textAlign: TextAlign.center),
               const SizedBox(height: 4),
               Text(l10n.qiblaFromCity(Prefs.locationLabel),
                   style: t.bodySmall
@@ -295,37 +346,62 @@ class _StaticFallback extends StatelessWidget {
   }
 }
 
-/// Draws a small Kaaba: dark cube with the gold band — no emoji, no asset.
-class _KaabaPainter extends CustomPainter {
-  _KaabaPainter({this.size = 24});
+class _QiblaHeroIcon extends StatelessWidget {
+  const _QiblaHeroIcon({required this.size});
 
   final double size;
 
   @override
-  void paint(Canvas canvas, Size canvasSize) {
-    final s = size;
-    final rect = Rect.fromCenter(
-      center: canvasSize.center(Offset.zero),
-      width: s,
-      height: s,
-    );
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(s * 0.12));
-    canvas.drawRRect(rrect, Paint()..color = const Color(0xFF101010));
-    // gold band
-    final band = Rect.fromLTWH(rect.left, rect.top + s * 0.30, s, s * 0.16);
-    canvas.drawRect(band, Paint()..color = SukoonColors.accent);
-    // subtle border
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1
-        ..color = SukoonColors.goldDeep,
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x55000000),
+            blurRadius: 8,
+            spreadRadius: 0.5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: SvgPicture.asset('assets/illustrations/qibla_kaaba.svg'),
     );
   }
+}
+
+class _RingQiblaMarker extends StatelessWidget {
+  const _RingQiblaMarker({required this.qibla, required this.dialSize});
+
+  final double qibla;
+  final double dialSize;
 
   @override
-  bool shouldRepaint(_KaabaPainter old) => old.size != size;
+  Widget build(BuildContext context) {
+    const markerSize = 30.0;
+    final radius = dialSize / 2;
+    final markerRadius = radius - 84;
+    final qa = (qibla - 90) * math.pi / 180.0;
+    final cx = radius + markerRadius * math.cos(qa) - markerSize / 2;
+    final cy = radius + markerRadius * math.sin(qa) - markerSize / 2;
+
+    return Positioned(
+      left: cx,
+      top: cy,
+      child: Transform.rotate(
+        angle: qa + math.pi / 2,
+        child: const _QiblaHeroIcon(size: markerSize),
+      ),
+    );
+  }
+}
+
+String _bearingCardinal(double degrees) {
+  const points = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  final idx = ((normalizeDegrees(degrees) + 22.5) / 45.0).floor() % 8;
+  return points[idx];
 }
 
 class _RosePainter extends CustomPainter {
@@ -399,18 +475,8 @@ class _RosePainter extends CustomPainter {
     label('S', 180, SukoonColors.textSecondary, 14);
     label('W', 270, SukoonColors.textSecondary, 14);
 
-    // Kaaba marker at the qibla bearing (drawn, not emoji).
-    final qa = (qibla - 90) * math.pi / 180.0;
-    final kc = Offset(center.dx + (r - 84) * math.cos(qa),
-        center.dy + (r - 84) * math.sin(qa));
-    canvas.save();
-    canvas.translate(kc.dx, kc.dy);
-    canvas.rotate(qa + math.pi / 2);
-    canvas.translate(-13, -13);
-    _KaabaPainter(size: 26).paint(canvas, const Size(26, 26));
-    canvas.restore();
-
     // qibla pointer triangle at the rim
+    final qa = (qibla - 90) * math.pi / 180.0;
     final tip = Offset(center.dx + (r - 6) * math.cos(qa),
         center.dy + (r - 6) * math.sin(qa));
     final baseL = Offset(center.dx + (r - 20) * math.cos(qa - 0.045),
