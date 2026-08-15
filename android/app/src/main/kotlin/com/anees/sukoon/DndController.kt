@@ -126,6 +126,9 @@ object DndController {
         title: String,
         body: String,
         endLabel: String,
+        prayerKey: String? = null,
+        delay15Label: String = "+15m",
+        delay30Label: String = "+30m",
     ) {
         ensureChannels(ctx)
         val endPi = PendingIntent.getBroadcast(
@@ -140,7 +143,7 @@ object DndController {
             Intent(ctx, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        val n = NotificationCompat.Builder(ctx, CHANNEL_SILENCE)
+        val builder = NotificationCompat.Builder(ctx, CHANNEL_SILENCE)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(body)
@@ -149,8 +152,23 @@ object DndController {
             .setContentIntent(openPi)
             .addAction(0, endLabel, endPi)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-        notifySafe(ctx, NOTIF_ID_SILENCE, n)
+            
+        if (!prayerKey.isNullOrEmpty()) {
+            val delay15Pi = PendingIntent.getBroadcast(
+                ctx, 3115,
+                Intent(ctx, DelayJamatReceiver::class.java).putExtra("prayer", prayerKey).putExtra("delay", 15),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val delay30Pi = PendingIntent.getBroadcast(
+                ctx, 3130,
+                Intent(ctx, DelayJamatReceiver::class.java).putExtra("prayer", prayerKey).putExtra("delay", 30),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            builder.addAction(0, delay15Label, delay15Pi)
+            builder.addAction(0, delay30Label, delay30Pi)
+        }
+            
+        notifySafe(ctx, NOTIF_ID_SILENCE, builder.build())
     }
 
     /** One-shot reminder / pre-azan heads-up. */
