@@ -24,6 +24,11 @@ String formatTime(String localeName, DateTime t) =>
 String formatShortDate(String localeName, DateTime d) =>
     DateFormat.MMMEd(localeName).format(d);
 
+/// Date with year like "Mon, Aug 11, 2034" — used when the date may be
+/// years in the future and omitting the year would be misleading.
+String formatDateWithYear(String localeName, DateTime d) =>
+    DateFormat.yMMMEd(localeName).format(d);
+
 /// Countdown like "1h 12m" / "12m 05s".
 String formatCountdown(Duration d) {
   if (d.isNegative) return '0m';
