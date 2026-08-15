@@ -26,8 +26,21 @@ class ScheduleSync {
       madhab: Prefs.madhab,
     );
 
+    // Apply per-prayer jamat offset: shift each prayer's start time so
+    // auto-silent fires at jamat time, not raw adhan time.
+    final offsetDayMaps = <Map<String, DateTime>>[];
+    for (final d in days) {
+      final raw = d.toMap();
+      final adjusted = <String, DateTime>{};
+      for (final key in raw.keys) {
+        final offset = Prefs.jamatOffset(key);
+        adjusted[key] = raw[key]!.add(Duration(minutes: offset));
+      }
+      offsetDayMaps.add(adjusted);
+    }
+
     final instants = buildInstants(
-      dayMaps: [for (final d in days) d.toMap()],
+      dayMaps: offsetDayMaps,
       isEnabled: (k) => Prefs.masterEnabled && Prefs.prayerEnabled(k),
       silenceMinutes: Prefs.silenceMinutes,
       now: now,
