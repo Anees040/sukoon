@@ -103,8 +103,15 @@ object PrayerAlarmScheduler {
         val now = System.currentTimeMillis()
         val notifEnabled = payload.optBoolean("notifEnabled", true)
         val preAzanMinutes = payload.optInt("preAzanMinutes", 0)
-        val endNowLabel = payload.optJSONObject("strings")?.optString("endNow")
+        
+        val strings = payload.optJSONObject("strings")
+        val endNowLabel = strings?.optString("endNow")
             .let { if (it.isNullOrEmpty()) "End now" else it }
+        val delay15Label = strings?.optString("delay15")
+            .let { if (it.isNullOrEmpty()) "+15m" else it }
+        val delay30Label = strings?.optString("delay30")
+            .let { if (it.isNullOrEmpty()) "+30m" else it }
+            
         val instants = payload.optJSONArray("instants") ?: return
 
         var idx = 0
@@ -117,11 +124,14 @@ object PrayerAlarmScheduler {
 
             if (start > now) {
                 val si = startIntent(ctx)
+                    .putExtra("prayer", inst.optString("prayer"))
                     .putExtra("end", end)
                     .putExtra("title", inst.optString("notifTitle"))
                     .putExtra("body", inst.optString("notifBody"))
                     .putExtra("notif", notifEnabled)
                     .putExtra("endLabel", endNowLabel)
+                    .putExtra("delay15Label", delay15Label)
+                    .putExtra("delay30Label", delay30Label)
                 exactOrBest(ctx, start, broadcastPi(ctx, RC_START_BASE + idx, si))
 
                 if (preAzanMinutes > 0 && inst.has("preTitle")) {
