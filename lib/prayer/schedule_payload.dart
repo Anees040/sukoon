@@ -94,6 +94,8 @@ Map<String, Object?> buildSchedulePayload({
   required String reminderTitle,
   required String reminderBody,
   required String endNowLabel,
+  required String delay15Label,
+  required String delay30Label,
 }) {
   return {
     'version': 1,
@@ -109,6 +111,10 @@ Map<String, Object?> buildSchedulePayload({
       'title': reminderTitle,
       'body': reminderBody,
     },
-    'strings': {'endNow': endNowLabel},
+    'strings': {
+      'endNow': endNowLabel,
+      'delay15': delay15Label,
+      'delay30': delay30Label,
+    },
   };
 }
