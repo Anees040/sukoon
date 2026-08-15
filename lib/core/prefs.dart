@@ -105,6 +105,17 @@ class Prefs {
     _bump();
   }
 
+  // ---- jamat offset ----
+  /// Minutes after adhan to shift auto-silent (per prayer).
+  static int jamatOffset(String prayerKey) =>
+      _p.getInt('${PrefKeys.jamatOffsetPrefix}$prayerKey') ??
+      Defaults.jamatOffset[prayerKey] ??
+      0;
+  static Future<void> setJamatOffset(String prayerKey, int minutes) async {
+    await _p.setInt('${PrefKeys.jamatOffsetPrefix}$prayerKey', minutes);
+    _bump();
+  }
+
   // ---- notifications & reminders ----
   static bool get notifEnabled => _p.getBool(PrefKeys.notifEnabled) ?? true;
   static Future<void> setNotifEnabled(bool v) async {
