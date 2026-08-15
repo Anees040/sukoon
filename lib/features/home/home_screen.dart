@@ -223,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen>
                     l10n.homeAutoSilenceAt(
                         formatTime(l10n.localeName,
                             next.time.add(Duration(
-                                minutes: Prefs.jamatOffset(next.prayer)))),
+                                minutes: Prefs.jamatOffset(next.prayer, next.time)))),
                         Prefs.silenceMinutes),
                     style:
                         t.bodyMedium?.copyWith(color: SukoonColors.lime),
