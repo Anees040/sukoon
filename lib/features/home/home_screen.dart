@@ -221,7 +221,9 @@ class _HomeScreenState extends State<HomeScreen>
                     Prefs.prayerEnabled(next.prayer))
                   Text(
                     l10n.homeAutoSilenceAt(
-                        formatTime(l10n.localeName, next.time),
+                        formatTime(l10n.localeName,
+                            next.time.add(Duration(
+                                minutes: Prefs.jamatOffset(next.prayer)))),
                         Prefs.silenceMinutes),
                     style:
                         t.bodyMedium?.copyWith(color: SukoonColors.lime),
