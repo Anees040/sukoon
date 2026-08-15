@@ -33,8 +33,9 @@ class ScheduleSync {
       final raw = d.toMap();
       final adjusted = <String, DateTime>{};
       for (final key in raw.keys) {
-        final offset = Prefs.jamatOffset(key);
-        adjusted[key] = raw[key]!.add(Duration(minutes: offset));
+        final adhan = raw[key]!;
+        final offset = Prefs.jamatOffset(key, adhan);
+        adjusted[key] = adhan.add(Duration(minutes: offset));
       }
       offsetDayMaps.add(adjusted);
     }
@@ -66,6 +67,8 @@ class ScheduleSync {
       reminderTitle: l10n.notifReminderTitle,
       reminderBody: l10n.notifReminderBody,
       endNowLabel: l10n.endNow,
+      delay15Label: l10n.notifDelay15,
+      delay30Label: l10n.notifDelay30,
     );
 
     await AlarmsChannel.syncSchedule(jsonEncode(payload));
