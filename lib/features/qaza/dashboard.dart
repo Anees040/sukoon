@@ -32,16 +32,30 @@ class _QazaDashboardState extends State<QazaDashboard> {
   late final ConfettiController _confetti =
       ConfettiController(duration: const Duration(seconds: 2));
 
+  /// The last revision we saw — skip redundant reloads.
+  int _lastQazaRevision = -1;
+
   @override
   void initState() {
     super.initState();
     _reload();
+    QazaRepository.revision.addListener(_onQazaChanged);
   }
 
   @override
   void dispose() {
+    QazaRepository.revision.removeListener(_onQazaChanged);
     _confetti.dispose();
     super.dispose();
+  }
+
+  /// Called whenever the qaza DB is mutated (from tracker or repay).
+  void _onQazaChanged() {
+    final rev = QazaRepository.revision.value;
+    if (rev != _lastQazaRevision) {
+      _lastQazaRevision = rev;
+      _reload();
+    }
   }
 
   Future<void> _reload() async {
@@ -324,13 +338,22 @@ class _RepayButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          child: Text(
-            '+1',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: enabled ? SukoonColors.bg : SukoonColors.textFaint,
-                  fontWeight: FontWeight.w700,
-                ),
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check,
+                  size: 16,
+                  color: enabled ? SukoonColors.bg : SukoonColors.textFaint),
+              const SizedBox(width: 4),
+              Text(
+                '-1',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: enabled ? SukoonColors.bg : SukoonColors.textFaint,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
           ),
         ),
       ),
