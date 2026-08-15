@@ -59,6 +59,8 @@
   "@notifSilenceBody": {
     "placeholders": { "time": { "type": "String" } }
   },
+  "notifDelay15": "+15m (Jamat later)",
+  "notifDelay30": "+30m",
   "notifPreAzanTitle": "{prayer} soon",
   "@notifPreAzanTitle": {
     "placeholders": { "prayer": { "type": "String" } }
