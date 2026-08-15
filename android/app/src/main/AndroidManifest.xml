@@ -43,6 +43,7 @@
         <receiver android:name=".PrayerAlarmReceiver" android:exported="false" />
         <receiver android:name=".RestoreRingerReceiver" android:exported="false" />
         <receiver android:name=".ReminderReceiver" android:exported="false" />
+        <receiver android:name=".DelayJamatReceiver" android:exported="false" />
 
         <!-- System broadcasts — must be exported to receive them. -->
         <receiver android:name=".BootReceiver" android:exported="true">
