@@ -93,6 +93,8 @@ void main() {
         reminderTitle: 'Qaza time',
         reminderBody: 'A little tonight?',
         endNowLabel: 'End now',
+        delay15Label: '+15m (Jamat later)',
+        delay30Label: '+30m',
       );
       expect(payload['version'], 1);
 
@@ -106,6 +108,8 @@ void main() {
       expect(decoded['reminder']['hour'], 21);
       expect(decoded['reminder']['enabled'], isTrue);
       expect(decoded['strings']['endNow'], 'End now');
+      expect(decoded['strings']['delay15'], '+15m (Jamat later)');
+      expect(decoded['strings']['delay30'], '+30m');
     });
   });
 }
