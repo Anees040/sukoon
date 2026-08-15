@@ -58,6 +58,7 @@ class PrefKeys {
   static const minutesPerQaza = 'minutesPerQaza';
   static const favoriteCities = 'favoriteCities';
   static const qazaWizardDone = 'qazaWizardDone';
+  static const jamatOffsetPrefix = 'jamatOffset_'; // + prayer key → int minutes
 }
 
 class Defaults {
@@ -74,4 +75,14 @@ class Defaults {
   static const minutesPerQaza = 5;
   static const reminderHour = 21; // 9:00 PM
   static const reminderMinute = 0;
+
+  /// Default jamat delay (minutes after adhan) per prayer — based on typical
+  /// Pakistani masjid schedules. Users can tune these in Settings.
+  static const Map<String, int> jamatOffset = {
+    PrayerKeys.fajr: 50,
+    PrayerKeys.zuhr: 15,
+    PrayerKeys.asr: 10,
+    PrayerKeys.maghrib: 5,
+    PrayerKeys.isha: 15,
+  };
 }
