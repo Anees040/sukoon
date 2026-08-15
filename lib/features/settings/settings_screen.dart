@@ -77,6 +77,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
+                const Divider(height: 20, color: SukoonColors.stroke),
+                Text(l10n.settingsJamatDelay, style: t.titleSmall),
+                const SizedBox(height: 4),
+                Text(l10n.settingsJamatHint,
+                    style: t.bodySmall
+                        ?.copyWith(color: SukoonColors.textSecondary)),
+                const SizedBox(height: 8),
+                for (final prayer in PrayerKeys.five) ...[
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 76,
+                        child: Text(prayerName(l10n, prayer),
+                            style: t.bodyMedium),
+                      ),
+                      Expanded(
+                        child: Slider(
+                          value: Prefs.jamatOffset(prayer).toDouble(),
+                          min: 0,
+                          max: 90,
+                          divisions: 18,
+                          label: l10n.minutesFull(Prefs.jamatOffset(prayer)),
+                          onChanged: (v) async {
+                            await Prefs.setJamatOffset(prayer, v.round());
+                            await _sync();
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        width: 48,
+                        child: Text(
+                            l10n.minutesFull(Prefs.jamatOffset(prayer)),
+                            style: t.labelMedium?.copyWith(
+                                color: SukoonColors.accent),
+                            textAlign: TextAlign.end),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
