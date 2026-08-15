@@ -107,10 +107,38 @@ class Prefs {
 
   // ---- jamat offset ----
   /// Minutes after adhan to shift auto-silent (per prayer).
-  static int jamatOffset(String prayerKey) =>
-      _p.getInt('${PrefKeys.jamatOffsetPrefix}$prayerKey') ??
-      Defaults.jamatOffset[prayerKey] ??
-      0;
+  /// If no user preference is set, applies smart cultural defaults (e.g. snapping
+  /// to the next logical clock half-hour for Zuhr/Isha).
+  static int jamatOffset(String prayerKey, DateTime adhan) {
+    final custom = _p.getInt('${PrefKeys.jamatOffsetPrefix}$prayerKey');
+    if (custom != null) return custom;
+    
+    // Smart Defaults (Idea 2)
+    switch (prayerKey) {
+      case PrayerKeys.fajr:
+        return 45; // Commonly 45-50 mins
+      case PrayerKeys.maghrib:
+        return 5;  // Very short gap
+      case PrayerKeys.asr:
+        // Snap to next 15-minute mark, at least 15 mins away
+        // e.g. 15:12 -> +15 = 15:27 -> snaps to 15:30 -> offset 18
+        final target = adhan.add(const Duration(minutes: 15));
+        final rem = target.minute % 15;
+        final snap = rem == 0 ? target : target.add(Duration(minutes: 15 - rem));
+        return snap.difference(adhan).inMinutes;
+      case PrayerKeys.zuhr:
+      case PrayerKeys.isha:
+        // Snap to next 30-minute mark, at least 15 mins away
+        // Zuhr usually 1:30 PM, Isha usually 8:00 or 8:30 PM.
+        final target = adhan.add(const Duration(minutes: 15));
+        final rem = target.minute % 30;
+        final snap = rem == 0 ? target : target.add(Duration(minutes: 30 - rem));
+        return snap.difference(adhan).inMinutes;
+      default:
+        return 15;
+    }
+  }
+
   static Future<void> setJamatOffset(String prayerKey, int minutes) async {
     await _p.setInt('${PrefKeys.jamatOffsetPrefix}$prayerKey', minutes);
     _bump();
