@@ -124,7 +124,7 @@ class PlannerCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    '${l10n.planFinishIn(days)} · ${l10n.planFinishDate(formatShortDate(l10n.localeName, finishDate))}',
+                    '${l10n.planFinishIn(days)} · ${l10n.planFinishDate(formatDateWithYear(l10n.localeName, finishDate))}',
                     style: t.bodyLarge?.copyWith(color: SukoonColors.lime),
                   ),
                 ),
