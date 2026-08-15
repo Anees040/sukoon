@@ -10,6 +10,7 @@ import 'package:sukoon/features/common/widgets.dart';
 import 'package:sukoon/features/settings/primers.dart';
 import 'package:sukoon/l10n/gen/app_localizations.dart';
 import 'package:sukoon/native/schedule_sync.dart';
+import 'package:sukoon/prayer/prayer_service.dart';
 import 'package:sukoon/theme.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -84,38 +85,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     style: t.bodySmall
                         ?.copyWith(color: SukoonColors.textSecondary)),
                 const SizedBox(height: 8),
-                for (final prayer in PrayerKeys.five) ...[
-                  Row(
+                Builder(builder: (context) {
+                  final today = PrayerService.range(
+                    from: DateTime.now(),
+                    count: 1,
+                    lat: Prefs.lat,
+                    lng: Prefs.lng,
+                    method: Prefs.method,
+                    madhab: Prefs.madhab,
+                  ).first.toMap();
+                  
+                  return Column(
                     children: [
-                      SizedBox(
-                        width: 76,
-                        child: Text(prayerName(l10n, prayer),
-                            style: t.bodyMedium),
-                      ),
-                      Expanded(
-                        child: Slider(
-                          value: Prefs.jamatOffset(prayer).toDouble(),
-                          min: 0,
-                          max: 90,
-                          divisions: 18,
-                          label: l10n.minutesFull(Prefs.jamatOffset(prayer)),
-                          onChanged: (v) async {
-                            await Prefs.setJamatOffset(prayer, v.round());
-                            await _sync();
-                          },
+                      for (final prayer in PrayerKeys.five) ...[
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 76,
+                              child: Text(prayerName(l10n, prayer),
+                                  style: t.bodyMedium),
+                            ),
+                            Expanded(
+                              child: Slider(
+                                value: Prefs.jamatOffset(prayer, today[prayer]!).toDouble(),
+                                min: 0,
+                                max: 90,
+                                divisions: 18,
+                                label: l10n.minutesFull(Prefs.jamatOffset(prayer, today[prayer]!)),
+                                onChanged: (v) async {
+                                  await Prefs.setJamatOffset(prayer, v.round());
+                                  await _sync();
+                                },
+                              ),
+                            ),
+                            SizedBox(
+                              width: 48,
+                              child: Text(
+                                  l10n.minutesFull(Prefs.jamatOffset(prayer, today[prayer]!)),
+                                  style: t.labelMedium?.copyWith(
+                                      color: SukoonColors.accent),
+                                  textAlign: TextAlign.end),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(
-                        width: 48,
-                        child: Text(
-                            l10n.minutesFull(Prefs.jamatOffset(prayer)),
-                            style: t.labelMedium?.copyWith(
-                                color: SukoonColors.accent),
-                            textAlign: TextAlign.end),
-                      ),
+                      ],
                     ],
-                  ),
-                ],
+                  );
+                }),
               ],
             ),
           ),
