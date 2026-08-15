@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:sukoon/data/db.dart';
@@ -18,6 +19,11 @@ class RepayResult {
 
 class QazaRepository {
   QazaRepository._();
+
+  /// Bumped on every data mutation so listeners (e.g. QazaDashboard) can
+  /// reactively reload without waiting for a tab switch or app restart.
+  static final ValueNotifier<int> revision = ValueNotifier<int>(0);
+  static void _bump() => revision.value++;
 
   static Future<bool> hasLedger() async {
     final db = await AppDb.get();
@@ -58,6 +64,7 @@ class QazaRepository {
           'repaid': repaid,
         });
       }
+      _bump();
     });
   }
 
@@ -77,6 +84,7 @@ class QazaRepository {
           where: 'prayer = ?', whereArgs: [prayer]);
       final logId = await txn.insert('qaza_log',
           {'date': date, 'prayer': prayer, 'count': applied});
+      _bump();
       return RepayResult(applied, logId);
     });
   }
@@ -98,6 +106,7 @@ class QazaRepository {
       if (repaid < 0) repaid = 0;
       await txn.update('qaza_state', {'repaid': repaid},
           where: 'prayer = ?', whereArgs: [prayer]);
+      _bump();
     });
   }
 
@@ -143,6 +152,7 @@ class QazaRepository {
         await txn.insert('pending_missed', {'date': date, 'prayer': prayer},
             conflictAlgorithm: ConflictAlgorithm.ignore);
       }
+      _bump();
     });
   }
 
@@ -164,6 +174,7 @@ class QazaRepository {
         await txn.delete('pending_missed',
             where: 'date = ? AND prayer = ?', whereArgs: [date, prayer]);
       }
+      _bump();
     });
   }
 
@@ -195,6 +206,7 @@ class QazaRepository {
         }
       }
       await txn.delete('pending_missed');
+      _bump();
     });
   }
 
