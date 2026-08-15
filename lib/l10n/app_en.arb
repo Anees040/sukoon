@@ -128,6 +128,8 @@
   "settingsWitr": "Include Witr in qaza",
   "settingsWitrHint": "Applies when you run the calculator again",
   "settingsMinutesPerQaza": "Minutes per qaza prayer",
+  "settingsJamatDelay": "Jamat delay",
+  "settingsJamatHint": "Minutes after adhan when your phone silences. Set to match your masjid\u2019s jamat time.",
   "settingsPermissions": "Permissions",
   "aboutVersion": "Sukoon {version} \u2014 made with \u2764\ufe0f in Pakistan",
   "@aboutVersion": {
@@ -187,7 +189,7 @@
       "prayer": { "type": "String" }
     }
   },
-  "qazaLongPressHint": "Tap +1 \u00b7 long-press +5",
+  "qazaLongPressHint": "Tap to repay 1 \u00b7 long-press to repay 5",
   "achievementsTitle": "Achievements",
   "achUnlockedSnack": "Unlocked: {title} \ud83c\udfc5",
   "@achUnlockedSnack": {
