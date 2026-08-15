@@ -32,6 +32,10 @@ class _TrackerScreenState extends State<TrackerScreen> {
   bool _loading = true;
   String? _error;
 
+  /// Prayers we already auto-missed this session (avoids duplicate DB writes
+  /// every time _reload() is called). Keyed as "date:prayer".
+  final Set<String> _autoMissedKeys = {};
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +64,8 @@ class _TrackerScreenState extends State<TrackerScreen> {
         _loading = false;
         _error = null;
       });
+      // After data loads, auto-detect unmarked prayers as missed.
+      await _autoDetectMissed();
     } catch (e, st) {
       // A DB error must never leave the screen spinning forever. Surface it
       // so it can be diagnosed (e.g. a stale schema needing app-data clear).
@@ -72,6 +78,54 @@ class _TrackerScreenState extends State<TrackerScreen> {
     }
   }
 
+  /// Check today's and yesterday's prayers: if a prayer's time has passed
+  /// and it is still unmarked (null status), auto-add it to the qaza ledger.
+  /// When Isha is auto-missed, Witr is also auto-missed (if enabled).
+  /// The entry stays until the user manually marks it prayed/jamaat.
+  Future<void> _autoDetectMissed() async {
+    final now = DateTime.now();
+    final today = dateOnly(now);
+    // Check today and yesterday (to catch last night's Isha/Witr).
+    for (final day in [today, previousDay(today)]) {
+      final key = dateKey(day);
+      // Skip period days — prayers are excused.
+      if (_monthPeriods.contains(key)) continue;
+
+      final dayTimes = PrayerService.forDay(
+        day: day,
+        lat: Prefs.lat,
+        lng: Prefs.lng,
+        method: Prefs.method,
+        madhab: Prefs.madhab,
+      ).toMap();
+
+      final dayLog = _monthLogs[key] ?? {};
+
+      for (final prayer in PrayerKeys.five) {
+        final prayerTime = dayTimes[prayer]!;
+        // Only consider prayers whose time has already passed.
+        if (!prayerTime.isBefore(now)) continue;
+        // Only auto-miss if the user hasn't marked it at all (null).
+        if (dayLog[prayer] != null) continue;
+        final autoKey = '$key:$prayer';
+        if (_autoMissedKeys.contains(autoKey)) continue;
+
+        _autoMissedKeys.add(autoKey);
+        await QazaRepository.addMissed(key, prayer);
+
+        // Isha missed → Witr also missed (Hanafi default).
+        if (prayer == PrayerKeys.isha && Prefs.witrEnabled) {
+          final witrKey = '$key:${PrayerKeys.witr}';
+          if (!_autoMissedKeys.contains(witrKey) &&
+              dayLog[PrayerKeys.witr] == null) {
+            _autoMissedKeys.add(witrKey);
+            await QazaRepository.addMissed(key, PrayerKeys.witr);
+          }
+        }
+      }
+    }
+  }
+
   Future<void> _cycle(String prayer) async {
     final l10n = AppLocalizations.of(context);
     final key = dateKey(_selected);
@@ -81,11 +135,30 @@ class _TrackerScreenState extends State<TrackerScreen> {
     HapticFeedback.selectionClick();
     await PrayerLogRepository.setStatus(key, prayer, next);
 
-    // Keep the qaza ledger in sync with "missed" marks.
+    // Keep the qaza ledger in sync with prayer marks.
     if (next == PrayerStatus.missed) {
+      // Explicitly marked missed — add to qaza.
       await QazaRepository.addMissed(key, prayer);
+      // Isha missed → Witr also missed.
+      if (prayer == PrayerKeys.isha && Prefs.witrEnabled) {
+        await QazaRepository.addMissed(key, PrayerKeys.witr);
+      }
     } else if (current == PrayerStatus.missed) {
+      // Was missed, now changed away from missed — remove from qaza.
       await QazaRepository.removeMissed(key, prayer);
+      if (prayer == PrayerKeys.isha && Prefs.witrEnabled) {
+        await QazaRepository.removeMissed(key, PrayerKeys.witr);
+      }
+    } else if (current == null &&
+        (next == PrayerStatus.prayed || next == PrayerStatus.jamaat)) {
+      // Was unmarked (possibly auto-missed) → now prayed/jamaat.
+      // Remove the auto-missed entry.
+      await QazaRepository.removeMissed(key, prayer);
+      _autoMissedKeys.remove('$key:$prayer');
+      if (prayer == PrayerKeys.isha && Prefs.witrEnabled) {
+        await QazaRepository.removeMissed(key, PrayerKeys.witr);
+        _autoMissedKeys.remove('$key:${PrayerKeys.witr}');
+      }
     }
     await _reload();
 
@@ -99,6 +172,9 @@ class _TrackerScreenState extends State<TrackerScreen> {
             onPressed: () async {
               await PrayerLogRepository.setStatus(key, prayer, current);
               await QazaRepository.removeMissed(key, prayer);
+              if (prayer == PrayerKeys.isha && Prefs.witrEnabled) {
+                await QazaRepository.removeMissed(key, PrayerKeys.witr);
+              }
               await _reload();
             },
           ),
