@@ -78,48 +78,24 @@ Sukoon provides a clean, intuitive interface for daily prayer management. Here's
 
 <div align="center">
 
-### Home & Dashboard
+### Home & Dashboard, City Selection & Location, Permission Management
 <p align="center">
   <img src="assets/screenshots/home_screen.jpeg" alt="Sukoon Home Screen" width="250"/>
-  <br/>
-  <em>Main dashboard showing today's prayer times and status</em>
-</p>
-
-### City Selection & Location
-<p align="center">
   <img src="assets/screenshots/city_selection_screen.jpeg" alt="City Selection Screen" width="250"/>
-  <br/>
-  <em>Offline prayer times for Pakistani cities</em>
-</p>
-
-### Permission Management
-<p align="center">
   <img src="assets/screenshots/permission_screen.jpeg" alt="Permission Screen" width="250"/>
   <br/>
-  <em>Required permissions for prayer time notifications</em>
+  <em>Main dashboard, city selection, and permission management screens</em>
 </p>
 
-### Settings Configuration
+### Settings Configuration, Prayer Tracker, Qibla Direction Finder
 <p align="center">
   <img src="assets/screenshots/settings_screen_1.jpeg" alt="Settings Screen 1" width="250"/>
   <img src="assets/screenshots/settings_screen_2.jpeg" alt="Settings Screen 2" width="250"/>
   <img src="assets/screenshots/settings_screen_3.jpeg" alt="Settings Screen 3" width="250"/>
-  <br/>
-  <em>Three settings screens covering general, prayer, and notification preferences</em>
-</p>
-
-### Prayer Tracker
-<p align="center">
   <img src="assets/screenshots/tracker_screen.jpeg" alt="Prayer Tracker Screen" width="250"/>
-  <br/>
-  <em>Daily namaz tracking with streak and heatmap views</em>
-</p>
-
-### Qibla Direction Finder
-<p align="center">
   <img src="assets/screenshots/qibla_finder.jpeg" alt="Qibla Direction Finder" width="250"/>
   <br/>
-  <em>Compass-based Qibla direction with mathematical bearing fallback</em>
+  <em>Settings (3 screens), Prayer Tracker, and Qibla Direction Finder</em>
 </p>
 
 </div>
