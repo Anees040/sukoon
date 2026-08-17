@@ -112,8 +112,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 max: 90,
                                 divisions: 18,
                                 label: l10n.minutesFull(Prefs.jamatOffset(prayer, today[prayer]!)),
-                                onChanged: (v) async {
-                                  await Prefs.setJamatOffset(prayer, v.round());
+                                onChanged: (v) {
+                                  Prefs.setJamatOffset(prayer, v.round());
+                                },
+                                onChangeEnd: (v) async {
                                   await _sync();
                                 },
                               ),
