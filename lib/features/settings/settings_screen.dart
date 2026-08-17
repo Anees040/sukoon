@@ -111,9 +111,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 min: 0,
                                 max: 90,
                                 divisions: 18,
-                                label: l10n.minutesFull(Prefs.jamatOffset(prayer, today[prayer]!)),
+                                label: '${Prefs.jamatOffset(prayer, today[prayer]!)}m',
                                 onChanged: (v) {
                                   Prefs.setJamatOffset(prayer, v.round());
+                                  setState(() {});
                                 },
                                 onChangeEnd: (v) async {
                                   await _sync();
@@ -121,9 +122,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                             SizedBox(
-                              width: 48,
+                              width: 44,
                               child: Text(
-                                  l10n.minutesFull(Prefs.jamatOffset(prayer, today[prayer]!)),
+                                  '+${Prefs.jamatOffset(prayer, today[prayer]!)}m',
                                   style: t.labelMedium?.copyWith(
                                       color: SukoonColors.accent),
                                   textAlign: TextAlign.end),
